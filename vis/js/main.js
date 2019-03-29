@@ -9,15 +9,22 @@ let svg;
 let sxControl, syControl, scControl;
 let sxControlColorBar, syControlColorBar;
 let controlRect;
-let parameters;
+
+
+let digit=0;
+let parameterLb = 0;
+let parameterUb = 1;
+
+let parameters = d3.range(160).map(d=>{
+  return {value: 0.5+(Math.random()-0.5)/3};
+  // return {value: 1.0};
+});
 
 
 let sxRecon, syRecon, scRecon;
 let imgRect, reconSize;
 
-let digit=0;
-let parameterLb = -10;
-let parameterUb = 10;
+
 
 
 
@@ -44,10 +51,10 @@ function initSvg(){
 
 function initControl(){
   let cellWidth = 20;
-  parameters = numeric.random([160]);
-  parameters = numeric.sub(parameters, 0.5);
-  parameters = numeric.mul(parameters, 10);
-  parameters = parameters.map(d=>({value:d}));
+  
+  // parameters = numeric.sub(parameters, 0.5);
+  // parameters = numeric.mul(parameters, 10);
+  // parameters = parameters.map(d=>({value:d}));
 
   sxControl = d3.scaleLinear()
   .domain([0,16])
@@ -64,8 +71,11 @@ function initControl(){
 
 
   scControl = d3.scaleLinear()
-  .domain([parameterLb, 0, parameterUb])
-  .range(d3.schemePuOr[3]);
+  .domain([0, 0.25, 0.5, 0.75, 1.0])
+  .range(['#998ec3','#d8daeb','#f7f7f7','#fee0b6','#f1a340']);
+  // scControl = d3.interpolateViridis;
+  // scControl = d3.interpolateSpectral;
+  // scControl = d3.interpolatePRGn;
 
 
   // .interpolator(d3.interpolatePuOr);
@@ -114,14 +124,15 @@ function initControl(){
   var drag = d3.drag()
   .on('start', function(d,i){})
   .on('drag', function(d,i){
-    let dy = -d3.event.dy / 10;
+    let dy = -d3.event.dy / 20;
     setDigit(Math.floor(i/16));
 
     parameters[i].value += dy;
     parameters[i].value = Math.max(parameters[i].value, parameterLb);
     parameters[i].value = Math.min(parameters[i].value, parameterUb);
-
     d3.select(this).attr('fill', d=>scControl(d.value));
+
+
     let img = newImg(digit, parameters.map(d=>d.value));
     draw(img);
   })
@@ -176,11 +187,17 @@ function initRecon(){
 
 function newImg(digit, parameters){
   if(parameters===undefined){
-    parameters = tf.randomNormal([10,16]);
+    parameters = tf.randomUniform([10,16]);
   }else{
+    parameters = parameters.map((d,j)=>{
+      // return 0.5 * d * (drange[j][1]-drange[j][0]) + drange[j][0];
+      let mean = dmeanstd[j][0];
+      let std = dmeanstd[j][1];
+      return (d-0.5)*4  *std+mean;
+    });
     parameters = tf.tensor2d(parameters, [10,16]);
   }
-  const dm = digitMask([digit]);
+  const dm = digitMask(digit);
   parameters = parameters.mul(dm).reshape([1,160]);
   let reconstructed = model.predict(parameters).dataSync();
   reconstructed = Array.from(reconstructed);
@@ -200,20 +217,25 @@ async function initModel(){
 }
 
 
-function digitMask(digits){
-  return tf.tidy(()=>{
-    const one = tf.ones([1,16]);
-    const zero = tf.zeros([1,16]);
-    const mask = Array(10).fill(0).map((_,j)=>{
-      if(digits.includes(j)){
-        return one;
-      }else{
-        return zero;
-      }
+masks = [];
+function digitMask(digit){
+  if (masks[digit] === undefined){
+    let m = tf.tidy(()=>{
+      const one = tf.ones([1,16]);
+      const zero = tf.zeros([1,16]);
+      const mask = Array(10).fill(0).map((_,j)=>{
+        if(digit == j){
+          return one;
+        }else{
+          return zero;
+        }
+      });
+      const digitMask = tf.concat(mask);
+      return digitMask;
     });
-    const digitMask = tf.concat(mask);
-    return digitMask;
-  });
+    masks[digit] = m;
+  }
+  return masks[digit]
 }
 
 
