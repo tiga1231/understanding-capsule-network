@@ -7,7 +7,7 @@ cd writing
 http-server
 ```
 
-## Generative model visualization
+## Visualization of the generative model 
 ![fig:user interface](readme-fig/ui-explain.png)
 
 <!-- ## TODOs
