@@ -1,0 +1,11 @@
+svg{
+    background: #fff;
+}
+
+.caption{
+    text-align: center;
+    color: #555;
+    font-size: .9em;
+    font-style: italic;
+    /*border: 3px solid green;*/
+}

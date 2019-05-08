@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<!-- <script src="https://distill.pub/template.v2.js"></script> -->
+<script src="js/distill-template/template.v2.js"></script>
+
+<script src="js/lib/d3.v5.js"></script>
+<script src="js/lib/tf.min.js"></script>
+<script src="js/lib/tfjs-vis.umd.min.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis@1.0.2/dist/tfjs-vis.umd.min.js"></script> -->
+<script src='js/lib/math.js'></script>
+<script src='js/lib/numeric-1.2.6.js'></script>
+
+<script src="js/constants.js"></script>
+
+<link href="css/style.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<d-front-matter>
+  <script type="text/json">{
+    "title": "Headline",
+    "description": "Description",
+    "authors": [
+      {
+        "author": "Mingwei Li",
+        "authorURL": "http://hdc.cs.arizona.edu/~mwli/",
+        "affiliation": "University of Arizona",
+        "affiliationURL": "https://www.cs.arizona.edu/"
+      }
+    ],
+    "katex": {
+      "delimiters" : [
+        {"left": "$", "right": "$", "display": false}
+      ]
+    }
+  }</script>
+</d-front-matter>
+<d-title>
+  <h1>Understanding Capsule Networks</h1>
+</d-title>
+<d-byline></d-byline>
+<d-article>
+<h2>Introduction</h2>
+<h2>What is capsule</h2>
+  <p>
+  A capsule is a sub-collection of neurons in a layer. 
+  In transforming auto-encoder (TODO CITE), each capsule in a layer only report to the corresponding capsule in the next layer. 
+  In this setting, capsules can be seen as branchings of a neural network. 
+  This branching forces the weight matrix for the whole layer to be sparse (block diagonal). 
+  </p>
+
+
+<h2>What is dynamic routing</h2>
+  <p>
+  In a feed-forward neural network, two layers are fully connected. Once trained, the weighting factor between any two neurons are fixed. 
+  Capsule networks (CapsNet) has these trainable weights as well. 
+  What makes CapsNet different, is that there are additional "routing coefficients" applied to these trainable weights, and those coefficients depend on input data. 
+  </p>
+
+
+<h2>A generative model (for free)</h2>
+  <p>
+  The CapsNet model uses image reconstruction as a mean for regularization/feature selection.
+  Unlike usual CNN classifiers, a CapsNet classifier outputs a richer representation of the class so that it has enough information to reconstruct the input from the classification.
+  This means once trained, we also get a generative model. 
+  There are interesting observations and future work in this model.
+  We dumped the reconstruction (decoder) part of the CapsNet to tensorflow.js (TODO CITE) to make the following demo (On Mac OSX it runs faster in Safari than in Chrome):
+  </p>
+
+  <d-figure>
+    <svg id="reconstruct"></svg>
+  </d-figure>
+  <script src="js/reconstruct.js"></script>
+  <p class='caption'>The generative model of CapsNet. Drag the cells up and down to tweak the parameters.</p>
+
+  <p>
+  Each row of the parametrization matrix (left) generates one kind of digits. 
+  The 16 entries on each row parametrize one class and they are colored by their magnitudes. 
+  We also standardized these parameters so that they have mean values at 0 and standard deviations at 1. In this demo viewers are able to tweak each value from -2 (purple) to 2 (orange).
+  </p>
+  <p>
+  Note that although these parameters were implicitly learned by the CapsNet, we can visually infer the meaning of these parameters, for example, the last parameter of digit 5 (6th row) encodes the width of the digit. 
+  However, not all parameters have a simple description. 
+  Some parameters learned by the machine represent complicated mixtures of features that we human use to describe things. 
+  To make parameters <em>explicit</em>, one may use the same trick in transforming auto-encoders (TODO CITE) to inject explicit features.
+  We also observed that over training and testing sets, the <em>marginal distributions</em> of these parameters follow bell-shaped curves, conditional on the class of the image. 
+  So setting these parameters to their extreme values makes a less likely, sometimes unrealistic digit.
+  There are correlations among pairs of parameters, to make them <em>uncorrelated</em>, one may change their basis using SVD/PCA. 
+  </p>
+
+</d-article>
+<d-appendix>
+  <!-- <h3>Supplementary material</h3>
+  <p>We host a separate web page for supplementary material here: 
+    <a href="./supplement.html">[link]</a>
+    <br>
+    This material includes mathematics of the grand tour and more comparison with other dimensionality reduction techniques.
+  </p> -->
+</d-appendix>
+<d-bibliography src="./bibliography.bib"></d-bibliography>
+</body>
+</html>

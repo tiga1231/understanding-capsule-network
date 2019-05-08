@@ -1,0 +1,244 @@
+/* Tooltip container */
+.tooltip {
+  position: relative;
+  display: inline-block;
+  /*border-bottom: 1px dotted black;*/
+}
+
+/* Tooltip text */
+.tooltip .tooltipText{
+  visibility: hidden;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  padding: 5px 5px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-family: sans-serif;
+  position: absolute;
+  z-index: 1;
+
+  bottom: 110%;
+  left: -80%; 
+}
+
+.tooltipTextBottom{
+  visibility: hidden;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  padding: 5px 5px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-family: sans-serif;
+  position: absolute;
+  z-index: 1;
+  top: 110%;
+  left: -80%;
+}
+
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltipText{
+  visibility: visible;
+}
+.tooltip:hover .tooltipTextBottom{
+  visibility: visible;
+}
+/*--------------------------------------*/
+
+a, i, .legendRect, .legendText, button, select, option{
+    cursor: pointer;
+}
+
+.modeOption, .grandtourButton{
+    display: inline;
+    margin-right: 10px;
+}
+
+svg.confusionMatrix{
+    display: block;
+    margin: 0 auto;
+}
+
+
+.caption{
+    text-align: center;
+    color: #555;
+    font-size: .9em;
+    font-style: italic;
+    /*border: 3px solid green;*/
+}
+
+
+.options{
+    position: sticky;
+    top: 0;
+    color: rgba(255, 255, 255, 0.8);
+    /*background-color: hsl(200, 60%, 15%);*/
+    background-color: hsl(200, 30%, 30%);
+    width: 100%;
+    height: 60px;
+    z-index: 10;
+}
+
+.dropdown-menu{
+    color: rgba(255, 255, 255, 0.8);
+}
+
+
+
+
+svg text{
+-webkit-user-select: none;
+   -moz-user-select: none;
+    -ms-user-select: none;
+        user-select: none;
+        font-weight: normal;
+        font-size: 10pt;
+        fill: #333;
+}
+
+svg.confusionMatrix text{
+    font-weight: 200;
+    /*font-size: 12px;*/
+}
+
+
+d-figure{
+    position: relative;
+    grid-column: text;
+}
+
+d-figure.fullscreen{
+    grid-column: page;
+}
+
+canvas.grandtour{
+    width: 100%; 
+    height: 300px;
+}
+
+canvas.grandtour.fullscreen{
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    grid-column: page;
+}
+
+
+
+
+d-figure.smallmultiple, d-figure.smallmultiple0{
+    grid-column: text;
+}
+
+canvas.smallmultiple, canvas.smallmultiple0{
+    margin-top: 30px;
+    margin-left: 10%;
+    margin-right: 10%;
+    width: 80%; 
+}
+
+.smallmultiple.fullscreen, .smallmultiple0.fullscreen{
+    grid-column: page;
+}
+
+#smallmultiple-fullscreenButton{
+    position: absolute;
+    top: -5px;
+    left: calc(100% - 32px);
+    font-size: 20px;
+    opacity: 0.7;
+}
+#smallmultiple-clearBrushButton{
+    position: absolute;
+    top: -5px;
+    left: calc(100% - 32px - 32px);
+    font-size: 20px;
+    opacity: 0.7;
+}
+
+
+
+.overlay{
+    position: absolute;
+}
+
+.play-button{
+    position: absolute;
+    top: calc(100% - 40px);
+    left: calc(15% - 30px);
+    font-size: 20px;
+    opacity: 0.7;
+}
+
+.teaser-fullscreenButton{
+    position: absolute;
+    top: 48px;
+    left: 13px; /*77%;*/
+    font-size: 20px;
+    opacity: 0.3;
+}
+
+.teaser-grandtourButton{
+    position: absolute;
+    top: calc(100% - 40px);
+    left: 13px; /*77%;*/
+    font-size: 20px;
+    opacity: 0.7;
+}
+
+
+
+.slider {
+    position: absolute;
+    top: calc(100% - 34px);
+    left: 15%;
+    width: 60%;
+    -webkit-appearance: none;
+    grid-column: middle;
+    height: 5px;
+    border-radius: 1px;   
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%; 
+    background: #4CAF50;
+    cursor: pointer;
+}
+.slider::-moz-range-thumb {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #4CAF50;
+    cursor: pointer;
+}
+.layerSlider {
+    top: calc(100% - 70px);
+}
+
+.layerSlider {
+    top: calc(100% - 70px);
+}
+
+canvas.layertransition {
+    width: 100%;
+    height: 500px;
+}
+
+.layerSliderLandmark {
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+}
