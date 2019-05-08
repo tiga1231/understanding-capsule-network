@@ -43,24 +43,85 @@
 <d-byline></d-byline>
 <d-article>
 <h2>Introduction</h2>
-<h2>What is capsule</h2>
+  <p>
+    Hinton et al. first introduced the idea of capsules in a paper called Transforming Auto-encoders (TODO CITE). 
+    People refer to artificial neural networks with capsules as Capsule Network (CapsNet).
+    This project aim to understand its sequiel paper by Sabor (TODO CITE). Particularly interesting is the technique called dynamic routing first introduced in the paper. 
+    We also visually explore the generative model included in the CapsNet MNIST classifier.
+  </p>
+<h2>What is a capsule</h2>
   <p>
   A capsule is a sub-collection of neurons in a layer. 
-  In transforming auto-encoder (TODO CITE), each capsule in a layer only report to the corresponding capsule in the next layer. 
-  In this setting, capsules can be seen as branchings of a neural network. 
+  For example in the illustration below, there are three capsules (of dimensionality 3) in the first layer that are connected to three capsules (of dimensionality 2) in the second.
+  In transforming auto-encoder (TODO CITE), each capsule in a layer only report to a single capsule in the next layer. 
+  Under this setting, capsules can be seen as branchings of a neural network. 
   This branching forces the weight matrix for the whole layer to be sparse (block diagonal). 
   </p>
-
+  <d-figure>
+    <img src='fig/capsule.png'>
+  </d-figure>
+  
 
 <h2>What is dynamic routing</h2>
   <p>
-  In a feed-forward neural network, two layers are fully connected. Once trained, the weighting factor between any two neurons are fixed. 
-  Capsule networks (CapsNet) has these trainable weights as well. 
-  What makes CapsNet different, is that there are additional "routing coefficients" applied to these trainable weights, and those coefficients depend on input data. 
+  In a feed-forward neural network, two consecutive layers are fully connected. The weighting between any two neurons are trainable but once trained, these weights are <em>fixed</em>, independent of the input. 
+  A capsule network (CapsNet) has these trainable weights as well. 
+  What makes it different though, is that there are additional "routing coefficients" applied to these trainable weights, and the values of these coefficients depend on input data (hence "dynamic"). 
+  Without this dynamic routing, a CapsNet acts the same as regular feed-forward network.
+  </p>
+  <d-figure>
+    <img src='fig/capsule-dynamic-routing.png'>
+  </d-figure>
+  <p>
+  There are several characteristics of these routing coefficients. First, as the illustration (right) shows, the coefficients operates on capsule level. 
+  The contribution of a capsule to another capsule in the next layer is determined by the weight matrix and a single scalar coefficient. 
+  The final weight matrix between two layers can be seen as a regular linear transform overlaid by a routing coefficient matrix.  
+  For example, The first capsule $u \in R^3$ contributes to the second capsule $s \in R^2$ in the next layer by $0.1 \cdot W_{1,2} \cdot u$, where $0.1$ is the routing coefficient (which we will explain soon) and $W_{1,2}$ is a (2-by-3) matrix whose subscript denotes the indices of capsules in the two layers.  
+  Second, the total contribution of a capsule is exactly 1. 
+  In the example above, capsule $u$ route to capsule $v$ with routing coefficient $0.9$ and to capsule $s$ with $0.1$. 
+  One can see this as a voting scheme where each capsule in the layer before vote for each capsule in the layer after.
+  </p>
+  <p>
+  Next I will explain how the routing coefficients works. In the paper CITE this scheme is referred to as "routing-by-agreement". The main idea is that a capsule vote more if its transformation agree with the majority of other capsules. The following illustrations demonstrate the method. 
+  </p>
+  <d-figure>
+    <img src='fig/dynamic-routing-explained.png'>
+  </d-figure>
+  <p>
+  Dynamic routing is a method that iteratively update the routing coefficient. 
+  In the example shown above, we only show the routing coefficients to the first capsule in the next layer, denoted by $c_{i1}$ for capsule $u_i$. 
+  In the beginning, all $c_{i1}$'s initialize uniformly as $1/2$ because each capsule routes to all <em>two</em> capsules in the next layer. 
+  The activation of the first capsule $s_1$ in the next layer is the sum of all transformed and scaled vectors $c_{i1} W_{i1} u_i$ from the left layer.
+  The amount of change in coefficient (i.e. vote) is determined by the dot product between $s_i$ and each summand $c_{i1} W_{i1} u_i$. As the illustration shows, if the dot product is positive (blue and gray arrow), the coefficient will be greater in the next iteration (e.g. $c_{11} = 0.5 \rightarrow c_{11}=0.6$). 
+  If the dot product is negative (green and gray arrow), the coefficient will be less. 
+  The routing tend to reveal preference after a few iterations (e.g. 3 or 5).
+  </p>
+  <p>
+  One should be aware that we ignored some details in the actual method. 
+  For example, there is an additional non-linear scaling of $s_1$, known as the "squashing" in the paper, that force the norm of $s_1$ to be bounded. 
+  The dot product is actually computed after the squashing, but qualitatively it is the same with our explanation.
+  Second, the dot product determine a change in the log-posterior( = log prior + change), the final coefficient is the softmax of the log-posterior.
+  The paper covers these details thoroughly.
+  </p>
+  <p>Here is a real example in the CapsNet: </p>
+  <d-figure>
+    <img src='fig/dynamic-routing-input.png' style='width:20%; padding-left:40%'>
+  </d-figure>
+  <p>
+  The figure below shows 1152 (8 dimensional) incoming capsules (the $u_i$'s in the illustration) projected onto 3 capsules that represent final classification (digit 0,1 and 2). Each row shows the result after one iteration of dynamic routing. The blue dots show (the first two dimensions) of 1152 projected capsules (the $W_{ij}u_i$'s for $j=0,1,2$), whose radii encode routing coefficients (the $c_{ij}$'s). The red dot represent the weighted sum of 1152 projections ($s_j = \sum_i c_{ij}W_{ij}u_{i}$), scaled by a factor $1/4$ for the convenience of visualization. We can see that after 5 iteration, the true class (digit 2) got more supporting capsules and large activation than other classes. 
+  Note that in other classes, some dots shrink because more votes flow into the digit 2 capsule.
+  </p>
+  <d-figure>
+    <object width="100%" data="fig/dynamic-routing.svg" type="image/svg+xml"></object>
+  </d-figure>
+  <p>
+  To explore the power of dynamic routing, we trained the same network without dynamic routing. 
+  Unfortunately, the network achieved similar performance in terms of classification accuracy. 
+  We suspect that the network can fake this scheme by learning particular weights that cancel noisy activations (see the talk given be Hinton (TODO CITE)).
   </p>
 
 
-<h2>A generative model (for free)</h2>
+<h2>The generative model</h2>
   <p>
   The CapsNet model uses image reconstruction as a mean for regularization/feature selection.
   Unlike usual CNN classifiers, a CapsNet classifier outputs a richer representation of the class so that it has enough information to reconstruct the input from the classification.
@@ -73,7 +134,7 @@
     <svg id="reconstruct"></svg>
   </d-figure>
   <script src="js/reconstruct.js"></script>
-  <p class='caption'>The generative model of CapsNet. Drag the cells up and down to tweak the parameters.</p>
+  <p class='caption'>The generative model in CapsNet. Drag the cells up and down to tweak the parameters.</p>
 
   <p>
   Each row of the parametrization matrix (left) generates one kind of digits. 
@@ -85,19 +146,37 @@
   However, not all parameters have a simple description. 
   Some parameters learned by the machine represent complicated mixtures of features that we human use to describe things. 
   To make parameters <em>explicit</em>, one may use the same trick in transforming auto-encoders (TODO CITE) to inject explicit features.
-  We also observed that over training and testing sets, the <em>marginal distributions</em> of these parameters follow bell-shaped curves, conditional on the class of the image. 
+  We also observed that over training and testing sets, the <em>marginal distributions</em> of these parameters follow bell-shaped curves (figure below), conditional on the class of the image. 
   So setting these parameters to their extreme values makes a less likely, sometimes unrealistic digit.
   There are correlations among pairs of parameters, to make them <em>uncorrelated</em>, one may change their basis using SVD/PCA. 
   </p>
 
+  <d-figure>
+    <img src="fig/kde-non-standard.png">
+  </d-figure>
+  <p class="caption">Marginal distributions of 16 parameters (using KDE), for digit 6 and 7 (before standardization)</p>
+
+  <d-figure>
+    <img src="fig/kde.png">
+  </d-figure>
+  <p class="caption">Marginal distributions of 16 parameters (after standardization)</p>
+
+  <h2>Appendix A: Performance</h2>
+  <d-figure>
+    <object width="100%" data="fig/loss-199.svg" type="image/svg+xml"></object>
+  </d-figure>
+  <p class="caption">Training loss through time. Classification accuracy=99.12%</p>
+
+  <d-figure>
+    <img src="fig/reconstruct.png">
+  </d-figure>
+  <p class="caption">Reconstruction</p>
+
+
+
 </d-article>
 <d-appendix>
-  <!-- <h3>Supplementary material</h3>
-  <p>We host a separate web page for supplementary material here: 
-    <a href="./supplement.html">[link]</a>
-    <br>
-    This material includes mathematics of the grand tour and more comparison with other dimensionality reduction techniques.
-  </p> -->
+  
 </d-appendix>
 <d-bibliography src="./bibliography.bib"></d-bibliography>
 </body>

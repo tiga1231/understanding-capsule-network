@@ -9,3 +9,7 @@ svg{
     font-style: italic;
     /*border: 3px solid green;*/
 }
+
+img{
+  width: 100%;
+}
