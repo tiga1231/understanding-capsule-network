@@ -1,4 +1,4 @@
-# Visualizing Capsule Networks
+# Understanding Capsule Networks
 ## How to start
 To start, run an http server at writing/ e.g.
 
@@ -7,8 +7,7 @@ cd writing
 http-server
 ```
 
-## User interface
-### Explanation
+## Generative model visualization
 ![fig:user interface](readme-fig/ui-explain.png)
 
 <!-- ## TODOs
