@@ -11,7 +11,7 @@ http-server
 ### Explanation
 ![fig:user interface](readme-fig/ui-explain.png)
 
-## TODOs
+<!-- ## TODOs
 - reset button
 - Add a global color bar and parameter value when parameter changes (changes on hovering different cell)
 - Small histograms / KDEs for each parameter (then drag left/right to change values)
@@ -19,4 +19,4 @@ http-server
 - (done) Fix parameter range to [min, max] of samples
 
 ## Open questions
-- How to understand dynamic routing?
+- How to understand dynamic routing? -->
