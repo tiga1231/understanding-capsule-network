@@ -13,3 +13,8 @@ svg{
 img{
   width: 100%;
 }
+
+/*font-awesome*/
+.fas{
+  cursor: pointer;
+}

@@ -18,12 +18,12 @@ let parameterUb = 1;
 
 let parameters = d3.range(160).map(d=>{
   return {value: 0.5+(Math.random()-0.5)/3};
-  // return {value: 1.0};
 });
 
 
 let sxRecon, syRecon, scRecon;
 let imgRect, reconSize;
+let img;
 
 
 
@@ -34,14 +34,42 @@ async function main(){
   window.model = model;
   initSvg();
   initControl();
+  initButton();
   initControlColorbar();
   initRecon();
-  let img = newImg(0, parameters.map(d=>d.value)); 
-  draw(img);   
-  console.log('done')
+  img = newImg(0, parameters.map(d=>d.value)); 
+  draw(img);
+}
+
+function reset(){
+  parameters = d3.range(160).map(d=>{
+    return {value: 0.5+(Math.random()-0.5)/3};
+  });
+  img = newImg(digit, parameters.map(d=>d.value)); 
+  draw(img);
+
+  initControl();
+
 }
 
 
+function initButton(){
+  console.log('here')
+  let resetButton = d3.select(svg.node().parentNode)
+  .insert('div', ':first-child')
+  .append('i')
+  .attr('id', 'smallmultiple-clearBrushButton')
+  .on('mouseover', function() {
+    d3.select(this).style('opacity', 1);
+  })
+  .on('mouseout', function() {
+    d3.select(this).style('opacity', 0.7);
+  })
+  .attr('class', 'fas fa-sync-alt')
+  .on('click', ()=>{
+    reset();
+  })
+}
 
 function initSvg(){
   svg = d3.select('svg#reconstruct')
@@ -89,7 +117,9 @@ function initControl(){
   .data(parameters)
   .enter()
   .append('rect')
-  .attr('class', 'controlRect')
+  .attr('class', 'controlRect');
+
+  controlRect = svg.selectAll('.controlRect')
   .attr('x', (d,i)=>sxControl(i%16))
   .attr('y', (d,i)=>syControl(Math.floor(i/16)))
   .attr('width', sxControl(1)-sxControl(0)-1)
@@ -139,11 +169,6 @@ function initControl(){
   })
   .on('end', function(d,i){});
   controlRect.call(drag);
-
-
-  initControlColorbar();
-  
-
 }
 
 function initControlColorbar(){
