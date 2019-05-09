@@ -69,7 +69,9 @@
   In a feed-forward neural network, two consecutive layers are fully connected. The weighting between any two neurons are trainable but once trained, these weights are <em>fixed</em>, independent of the input. 
   A capsule network (CapsNet) has these trainable weights as well. 
   What makes it different though, is that there are additional "routing coefficients" applied to these trainable weights, and the values of these coefficients depend on input data (hence "dynamic"). 
-  Without this dynamic routing, a CapsNet acts the same as regular feed-forward network.
+  Without this dynamic routing, a CapsNet acts the same as regular feed-forward network. 
+  The analogous components of this dynamic routing in CNN is max pooling. Max pooling, in some sense, is a coarse way of selectively route information in the previous layer to the next - among a small pool of neurons, only the maximum get routed to the next layer.
+  Max pooling is exactly what Hinton wanted to replace (see <a href="https://www.youtube.com/watch?v=rTawFwUvnLE">his talk in MIT about "What is wrong with convolutional neural nets?"</a> ).
   </p>
   <d-figure>
     <img src='fig/capsule-dynamic-routing.png'>
@@ -92,7 +94,7 @@
   <p>
   Dynamic routing is a method that iteratively update the routing coefficient. 
   In the example shown above, we only show the routing coefficients to the first capsule in the next layer, denoted by $c_{i1}$ for capsule $u_i$. 
-  In the beginning, all $c_{i1}$'s initialize uniformly as $1/2$ because each capsule routes to all <em>two</em> capsules in the next layer. 
+  In the beginning, all $c_{i1}$'s initialize uniformly to $c_{i1}=1/2$ because each capsule routes to all <em>two</em> capsules in the next layer. 
   The activation of the first capsule $s_1$ in the next layer is the sum of all transformed and scaled vectors $c_{i1} W_{i1} u_i$ from the left layer.
   The amount of change in coefficient (i.e. vote) is determined by the dot product between $s_i$ and each summand $c_{i1} W_{i1} u_i$. As the illustration shows, if the dot product is positive (blue and gray arrow), the coefficient will be greater in the next iteration (e.g. $c_{11} = 0.5 \rightarrow c_{11}=0.6$). 
   If the dot product is negative (green and gray arrow), the coefficient will be less. 
