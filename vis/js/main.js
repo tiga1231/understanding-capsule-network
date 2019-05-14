@@ -213,7 +213,7 @@ function draw(img){
 
 
 async function initModel(){
-  return await tf.loadLayersModel('data/reconstruct/model.json');
+  return await tf.loadLayersModel(modelURL);
 }
 
 
