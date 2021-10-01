@@ -3,7 +3,7 @@
 To start, run an http server at writing/ e.g.
 
 ```
-cd writing
+cd docs
 http-server
 ```
 
